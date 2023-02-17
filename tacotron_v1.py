@@ -76,18 +76,47 @@ x = tf.keras.layers.Dropout(0.5, name="Encoder_prenet2_dropout")(x)
 #Encoder CBHG
 x = CBHG( x, ENCODER_CBHG_CHANNEL, ENCODER_CBHG_K, "Encoder_CBHG" )
 
+
+################################################################
+# DECODER
+
 #Decoder pre-net
-x = tf.keras.layers.Dense(256, name="Decoder_prenet1_dense")(x)
-x = tf.keras.layers.Activation("relu", name="Decoder_prenet1_relu")(x)
-x = tf.keras.layers.Dropout(0.5, name="Decoder_prenet1_dropout")(x)
-x = tf.keras.layers.Dense(128, name="Decoder_prenet2_dense")(x)
-x = tf.keras.layers.Activation("relu", name="Decoder_prenet2_relu")(x)
-x = tf.keras.layers.Dropout(0.5, name="Decoder_prenet2_dropout")(x)
+
+# pre-net should be made into a sequential model
+x = tf.keras.layers.Dense(256, name="Decoder_prenet1_dense")
+x = tf.keras.layers.Activation("relu", name="Decoder_prenet1_relu")
+x = tf.keras.layers.Dropout(0.5, name="Decoder_prenet1_dropout")
+x = tf.keras.layers.Dense(128, name="Decoder_prenet2_dense")
+x = tf.keras.layers.Activation("relu", name="Decoder_prenet2_relu")
+x = tf.keras.layers.Dropout(0.5, name="Decoder_prenet2_dropout")
+
+class RNNWrapper_Residual(AbstractRNNCell):
+    def __init__(self, cell, **kwargs):
+        super(MinimalRNNCell, self).__init__(**kwargs)
+        self.cell_wrapped = cell
+
+    @property
+    def state_size(self):
+        return self.cell_wrapped.units
+
+    def build(self, input_shape):
+        self.built = True
+
+    def call(self, inputs, states):
+        cell_out, cell_states = self.cell_wrapped(inputs, states)
+
+        return cell_out + cell_states[0], cell_states
+
+################################################################
 
 #Vinyals et al. (2015), a content-based tanh attention decoder
 #https://arxiv.org/pdf/1412.7449.pdf
 
 #참고
+#https://github.com/tensorflow/addons/blob/v0.17.0/tensorflow_addons/seq2seq/attention_wrapper.py#L1565-L2063
+#-> 구혀낭 
 #https://www.tensorflow.org/api_docs/python/tf/keras/layers/AbstractRNNCell
+
+# 만들어야하는거 - Residual RNN, Attention RNN wrapper
 
 outputs = x
