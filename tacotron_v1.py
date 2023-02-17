@@ -90,9 +90,9 @@ x = tf.keras.layers.Dense(128, name="Decoder_prenet2_dense")
 x = tf.keras.layers.Activation("relu", name="Decoder_prenet2_relu")
 x = tf.keras.layers.Dropout(0.5, name="Decoder_prenet2_dropout")
 
-class RNNWrapper_Residual(AbstractRNNCell):
+class RNNWrapper_Residual(tf.keras.layers.AbstractRNNCell):
     def __init__(self, cell, **kwargs):
-        super(MinimalRNNCell, self).__init__(**kwargs)
+        super(RNNWrapper_Residual, self).__init__(**kwargs)
         self.cell_wrapped = cell
 
     @property
