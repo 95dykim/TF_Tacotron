@@ -104,9 +104,10 @@ class RNNWrapper_Residual(tf.keras.layers.AbstractRNNCell):
 
     def call(self, inputs, states):
         cell_out, cell_states = self.cell_wrapped(inputs, states)
-   
-        #TODO - CHECK IF cell_states equals states. it should be, but just in case.
-        return cell_out + cell_states[0], cell_states
+
+        outputs = cell_out + cell_states[0]
+        
+        return outputs, outputs
 
 ################################################################
 
